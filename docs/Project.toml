@@ -1,0 +1,3 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+RemoteLogging = "5da01632-ec10-4c9a-b79c-b5b34d2fc1d9"

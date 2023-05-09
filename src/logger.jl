@@ -9,6 +9,22 @@ function Base.close(logger::RemoteLogger)
     close(logger.tcp2)
 end
 
+"""
+    RemoteLogger(; host, port, kwargs...)
+
+- `host`: IP address of the listener. Should be running in advance.
+- `port`: Port of the runner. port and port+1 will be used.
+- `displaywidth`: intended width of the log viewer.
+- `console_loglevel`: minimum log level to be displayed on remote console
+- `disk_loglevel`: minimum log level to be saved to disk (if enabled)
+- `directory`: target destination for file logging. Use empty string to disable.
+- `console_formatter`: extra formatter for console.
+- `disk_formatter`: extra formatter for disk.
+- `console_exclude_group`: log groups to ignore in console. Ignores :ProgressLogging by default.
+- `console_exclude_module`: source modules to ignore in console.
+- `disk_exclude_group`: log groups to ignore in disk.
+- `console_exclude_module`: source modules to ignore in disk. Copies console by default.
+"""
 function RemoteLogger(;
     host::IPAddr=IPv4(0),
     port::Integer=50003,

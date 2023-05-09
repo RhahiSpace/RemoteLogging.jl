@@ -22,4 +22,5 @@ makedocs(;
 deploydocs(;
     repo="github.com/RhahiSpace/RemoteLogging.jl",
     devbranch="main",
+    dirname="RemoteLogging",
 )

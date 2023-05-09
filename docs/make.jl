@@ -6,11 +6,11 @@ DocMeta.setdocmeta!(RemoteLogging, :DocTestSetup, :(using RemoteLogging); recurs
 makedocs(;
     modules=[RemoteLogging],
     authors="Rhahi <git@rhahi.com> and contributors",
-    repo="https://github.com/rhahi/RemoteLogging.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/RhahiSpace/RemoteLogging.jl/blob/{commit}{path}#{line}",
     sitename="RemoteLogging.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://rhahi.github.io/RemoteLogging.jl",
+        canonical="https://docs.rhahi.space/RemoteLogging",
         edit_link="main",
         assets=String[],
     ),
@@ -20,6 +20,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/rhahi/RemoteLogging.jl",
+    repo="github.com/RhahiSpace/RemoteLogging.jl",
     devbranch="main",
 )

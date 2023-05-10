@@ -10,7 +10,7 @@ function Base.close(logger::RemoteLogger)
 end
 
 """
-    RemoteLogger(; host, port, kwargs...)
+    RemoteLogger(; kwargs...)
 
 - `host`: IP address of the listener. Should be running in advance.
 - `port`: Port of the runner. port and port+1 will be used.

@@ -1,9 +1,11 @@
+"A shortcut function to start progress and message display"
 function activate_listener(host::IPAddr=IPv4(0), port::Integer=50003)
     tcp1 = RemoteLogging.listen_message(host, port)
     tcp2 = RemoteLogging.listen_progress(host, port+1)
     return tcp1, tcp2
 end
 
+"Listen to progress messages and show it"
 function listen_progress(host, port)
     server = listen(host, port)
     client_id = 0
@@ -50,7 +52,7 @@ function listen_progress(host, port)
     server
 end
 
-"Listen to any incoming message and print them"
+"Listen to any incoming message and print it"
 function listen_message(host, port, io=stderr)
     server = listen(host, port)
     client_id = 0

@@ -1,9 +1,11 @@
-using RemoteLogging
-using ProgressLogging
-using Test
-using Sockets
-using UUIDs
 using Logging
+using ProgressLogging
+using RemoteLogging
+using Serialization
+using Sockets
+using TerminalLoggers
+using Test
+using UUIDs
 
 include("debug_listener.jl")
 

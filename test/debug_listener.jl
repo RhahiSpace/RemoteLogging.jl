@@ -1,11 +1,11 @@
 mutable struct ProgressData
     server::Sockets.TCPServer
     clients::Int64
-    messages::Channel{ProgressLogging.ProgressString}
+    messages::Channel{ProgressLogging.Progress}
     active_progress::Vector{UUID}
     function ProgressData(host, port)
         server = listen(host, port)
-        messages = Channel{ProgressLogging.ProgressString}(100)
+        messages = Channel{ProgressLogging.Progress}(100)
         active_progress = Vector{UUID}()
         new(server, 0, messages, active_progress)
     end
@@ -17,19 +17,19 @@ function listen_progress(host, port)
         @info "Starting progress listener at $host:$port"
         while true
             conn = accept(debug.server)
-            debug.client_id += 1
+            debug.clients += 1
             @info "Accepted client P$(debug.clients)"
             @async begin
-                id = debug.client_id
+                id = debug.clients
                 logger = TerminalLogger(devnull)
                 try
                     with_logger(logger) do
                         while true
                             msg = deserialize(conn)
-                            if msg.id ∉ active_progress
+                            if msg.id ∉ debug.active_progress
                                 push!(debug.active_progress, msg.id)
                             end
-                            push!(debug.messages, ProgressLogging.ProgressString(msg))
+                            push!(debug.messages, msg)
                             if msg.done || isnothing(msg.fraction)
                                 idx = findfirst(x->x==msg.id, debug.active_progress)
                                 deleteat!(debug.active_progress, idx)
@@ -49,7 +49,7 @@ function listen_progress(host, port)
                     @info "Closed connection with client P$id"
                     close(conn)
                 end
-            end
+            end |> errormonitor
         end
     end
     debug

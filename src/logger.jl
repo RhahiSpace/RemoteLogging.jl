@@ -3,6 +3,13 @@ struct ConsoleRemoteLogger{T<:AbstractLogger} <: AbstractLogger
     logger::T
 end
 
+"""
+    ConsoleRemoteLogger(; kwargs...)
+
+Send log messages to a remote listener over the network.
+
+See RemoteLogger for documentation of keyword arguments.
+"""
 function ConsoleRemoteLogger(;
     host::IPAddr = IPv4(0),
     port::Integer = 50003,
@@ -35,6 +42,14 @@ function connect_to_listener(host, port, displaywidth)
     return tcp, ioc
 end
 
+"""
+    ProgressRemoteLogger(; host, port)
+
+Progress bars produced with this logger will appear in the remote listener.
+
+- `host`: IP address of the listener. Should be running in advance.
+- `port`: Port of the listener.
+"""
 struct ProgressRemoteLogger{T<:AbstractLogger} <: AbstractLogger
     tcp::TCPSocket
     logger::T
@@ -67,10 +82,13 @@ end
 """
     RemoteLogger(; kwargs...)
 
+Combination of ConsoleRemoteLogger and ProgressRemoteLogger. Log messages
+and progress bars produced with this logger will appear in the remote listener.
+
 # Arguments
 
 - `host`: IP address of the listener. Should be running in advance.
-- `port`: Port of the runner. `port` and `port+1` will be used.
+- `port`: Port of the listener. `port` and `port+1` will be used.
 - `console_displaywidth`: intended width of the log viewer.
 - `console_loglevel`: minimum log level to be displayed on remote console
 - `console_formatter`: extra formatter for console. It should be a function that
@@ -82,7 +100,6 @@ end
 function RemoteLogger(;
     host::IPAddr = IPv4(0),
     port::Integer = 50003,
-
     displaywidth::Integer = 80,
     loglevel::LogLevel = LogLevel(-1),
     formatter::Union{Function, Nothing} = nothing,
@@ -103,6 +120,11 @@ function RemoteLogger(;
     return RemoteLogger(console.tcp, progress.tcp, combined)
 end
 
+"""
+    group_module_filter(logger, ex_group, ex_module)
+
+Combined EarlyFilteredLogger that filters based on module and group of the log.
+"""
 function group_module_filter(logger, ex_group, ex_module)
     EarlyFilteredLogger(logger) do log
         log.group in ex_group && return false
@@ -111,6 +133,12 @@ function group_module_filter(logger, ex_group, ex_module)
     end
 end
 
+"""
+    root_module(m)
+
+Find the root module of the given module.
+Useful for filtering out modules in log messages.
+"""
 function root_module(m::Module)
     gp = m
     while (gp ≠ m)

@@ -20,6 +20,7 @@ try
         @test occursin("Warning", take!(messagedata.messages))
         @test occursin("@ Main", take!(messagedata.messages))
         @debug "test4"
+        sleep(0.1)
         @test !isready(messagedata.messages)
         @logmsg LogLevel(1500) "test5"
         @test occursin("test5", take!(messagedata.messages))
@@ -27,8 +28,10 @@ try
 
         # ignored groups should be ignored.
         @progress for i=1:10 end
+        sleep(0.1)
         @test !isready(messagedata.messages)
         @info "test6" _group=:exclude
+        sleep(0.1)
         @test !isready(messagedata.messages)
         @info "test7" _group=:include
         @test occursin("test7", take!(messagedata.messages))

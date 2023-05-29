@@ -61,9 +61,16 @@ function ProgressRemoteLogger(;
 )
     tcp = connect(host, port)
     base = TerminalLogger(devnull)
+    semaphore = Base.Semaphore(1)
     network = TransformerLogger(base) do log
-        if log.message isa ProgressLogging.ProgressString
-            serialize(tcp, log.message.progress)
+        try
+            if log.message isa ProgressLogging.ProgressString
+                Base.acquire(semaphore) do
+                    serialize(tcp, log.message.progress)
+                end
+            end
+        catch
+            println(stderr, "Failed to serialize `$(log.message)` during progress")
         end
         return log
     end

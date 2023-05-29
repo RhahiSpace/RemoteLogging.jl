@@ -68,6 +68,10 @@ function ProgressRemoteLogger(;
                 Base.acquire(semaphore) do
                     serialize(tcp, log.message.progress)
                 end
+            elseif log.message isa ProgressLogging.Progress
+                Base.acquire(semaphore) do
+                    serialize(tcp, log.message)
+                end
             end
         catch
             println(stderr, "Failed to serialize `$(log.message)` during progress")

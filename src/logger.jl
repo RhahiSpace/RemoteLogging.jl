@@ -35,6 +35,12 @@ function ConsoleRemoteLogger(;
     return ConsoleRemoteLogger(tcp, logger)
 end
 
+function console_example_formatter(ioc::IOContext)
+    FormatLogger(ioc) do io, args
+        println(io, args.message)
+    end
+end
+
 function connect_to_listener(host, port, displaywidth)
     tcp = connect(host, port)
     dsize = (displaysize()[1], displaywidth)

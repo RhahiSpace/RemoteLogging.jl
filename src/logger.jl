@@ -66,19 +66,30 @@ function connect_to_listener(host, port, displaywidth)
     return tcp, ioc
 end
 
-"""
-    ProgressRemoteLogger(; host, port)
-
-Progress bars produced with this logger will appear in the remote listener.
-
-- `host`: IP address of the listener. Should be running in advance.
-- `port`: Port of the listener.
-"""
 struct ProgressRemoteLogger{T<:AbstractLogger} <: AbstractLogger
     tcp::TCPSocket
     logger::T
 end
 
+"""
+    ProgressRemoteLogger(; [host,] [port])
+
+Create a logger that sends ProgressLogging.Progress information over TCP.
+
+# Example
+```julia
+# assuming that a listener has already been set up
+logger = ProgressRemoteLogger(; port=50011)
+with_logger(logger) do
+    @progress for i=1:10
+        sleep(0.1)
+    end
+end
+close(logger)
+```
+
+The progress message should appear on the remote listener.
+"""
 function ProgressRemoteLogger(;
     host::IPAddr=IPv4(0),
     port::Integer=50004,

@@ -1,6 +1,6 @@
 "A shortcut function to start progress and message display"
 function activate_listener(host::IPAddr=IPv4(0), port::Integer=50003;
-    autoclose=false
+    autoclose=true
 )
     tcp1 = RemoteLogging.listen_message(host, port)
     tcp2 = RemoteLogging.listen_progress(host, port+1)

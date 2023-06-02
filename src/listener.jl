@@ -41,7 +41,7 @@ function listen_progress(host, port)
                                 push!(active_progress, msg.id)
                             end
                             @info ProgressLogging.ProgressString(msg)
-                            if msg.done || isnothing(msg.fraction)
+                            if msg.done
                                 idx = findfirst(x->x==msg.id, active_progress)
                                 deleteat!(active_progress, idx)
                             end

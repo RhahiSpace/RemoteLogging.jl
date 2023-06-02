@@ -114,22 +114,25 @@ struct RemoteLogger{T<:AbstractLogger} <: AbstractLogger
 end
 
 """
-    RemoteLogger(; kwargs...)
+    RemoteLogger(; [kwargs...])
 
-Combination of ConsoleRemoteLogger and ProgressRemoteLogger. Log messages
+A combined ConsoleRemoteLogger and ProgressRemoteLogger. Log messages
 and progress bars produced with this logger will appear in the remote listener.
 
 # Arguments
 
-- `host`: IP address of the listener. Should be running in advance.
+- `host`: IP address of the listener. The listener should be running in advance.
 - `port`: Port of the listener. `port` and `port+1` will be used.
-- `console_displaywidth`: intended width of the log viewer.
-- `console_loglevel`: minimum log level to be displayed on remote console
+- `console_displaywidth`: intended width of the log viewer. It can be used by
+  the printer. RemoteLogging's default listener does not use this value.
+- `console_loglevel`: minimum log level to be sent to the remote console
 - `console_formatter`: extra formatter for console. It should be a function that
   accepts a logger and combine it with a another compositional logger.
-- `console_exclude_group`: log groups to ignore in console. Ignores
-  :ProgressLogging by default.
-- `console_exclude_module`: source modules to ignore in console.
+- `console_exclude_group`: log groups to ignore. Log messages with this group
+  will not be sent to ConsoleRemoteLogger. Ignores :ProgressLogging by default.
+- `console_exclude_module`: source modules to ignore in console. Log messages
+  that used to be hidden because it originates from another library will not
+  be filtered here. Specify them here so that they will not be sent.
 """
 function RemoteLogger(;
     host::IPAddr = IPv4(0),

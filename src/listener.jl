@@ -15,7 +15,11 @@ function activate_listener(host::IPAddr=IPv4(0), port::Integer=50003;
     return tcp1, tcp2
 end
 
-"Listen to progress messages and show it"
+"""
+    listen_progress(host, port)
+
+Listen to progress messages and show it.
+"""
 function listen_progress(host, port)
     server = listen(host, port)
     client_id = 0
@@ -62,7 +66,12 @@ function listen_progress(host, port)
     server
 end
 
-"Listen to any incoming message and print it"
+"""
+    listen_message(host, port, [io])
+
+Listen to incoming messages and print them.
+The formatting of the messages should be set in the RemoteLogger.
+"""
 function listen_message(host, port, io=stderr)
     server = listen(host, port)
     client_id = 0

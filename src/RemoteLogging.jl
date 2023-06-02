@@ -12,7 +12,7 @@ import Base.CoreLogging:
     AbstractLogger, SimpleLogger,
     handle_message, shouldlog, min_enabled_level, catch_exceptions
 
-export RemoteLogger, DiskLogger, ConsoleRemoteLogger, ProgressRemoteLogger, DataLogger
+export RemoteLogger, ConsoleRemoteLogger, ProgressRemoteLogger
 export activate_listener
 
 include("logger.jl")

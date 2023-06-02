@@ -1,4 +1,10 @@
-"A shortcut function to start progress and message display"
+"""
+    activate_listener(host, port; [autoclose])
+
+Start both progress and message listener using given host and port, port+1.
+If block is true, block the console, and clear the screen whenever a new line
+(enter) is pressed. To close the listener and disconnect the server, use Ctrl+C.
+"""
 function activate_listener(host::IPAddr=IPv4(0), port::Integer=50003;
     block=true
 )

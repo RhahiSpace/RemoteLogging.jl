@@ -10,7 +10,7 @@ makedocs(;
     sitename="RemoteLogging.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://docs.rhahi.space/RemoteLogging",
+        canonical="https://docs.rhahi.space/RemoteLogging.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -22,5 +22,4 @@ makedocs(;
 deploydocs(;
     repo="github.com/RhahiSpace/RemoteLogging.jl",
     devbranch="main",
-    dirname="RemoteLogging",
 )

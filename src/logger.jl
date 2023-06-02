@@ -4,7 +4,7 @@ struct ConsoleRemoteLogger{T<:AbstractLogger} <: AbstractLogger
 end
 
 """
-    ConsoleRemoteLogger(; [host,] port, [kwargs...])
+    ConsoleRemoteLogger(; [kwargs...])
 
 Create a logger that sends log messages over TCP as text.
 
@@ -52,6 +52,7 @@ function ConsoleRemoteLogger(;
     return ConsoleRemoteLogger(tcp, logger)
 end
 
+"An exmaple for implementing formatter for ConsoleRemoteLogger."
 function console_example_formatter(ioc::IOContext)
     FormatLogger(ioc) do io, args
         println(io, args.message)

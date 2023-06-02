@@ -30,7 +30,7 @@ function listen_progress(host, port)
                                 push!(debug.active_progress, msg.id)
                             end
                             push!(debug.messages, msg)
-                            if msg.done || isnothing(msg.fraction)
+                            if msg.done
                                 idx = findfirst(x->x==msg.id, debug.active_progress)
                                 deleteat!(debug.active_progress, idx)
                             end

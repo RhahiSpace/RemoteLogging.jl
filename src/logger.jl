@@ -4,11 +4,28 @@ struct ConsoleRemoteLogger{T<:AbstractLogger} <: AbstractLogger
 end
 
 """
-    ConsoleRemoteLogger(; kwargs...)
+    ConsoleRemoteLogger(; [host,] port, [kwargs...])
 
-Send log messages to a remote listener over the network.
+Create a logger that sends log messages over TCP as text.
 
-See RemoteLogger for documentation of keyword arguments.
+For full help of keyword arguments, see [`RemoteLogger`](@ref)
+
+To change formatting of the logger, pass a function that accepts IO and returns
+a FormatLogger using that IO. This formatter will be used as tthe final sink
+in ConsoleRemoteLogger. Otherwise, Logging.ConsoleLogger is used.
+
+# Example
+```julia
+# assuming that a listener has already been set up
+logger = ConsoleRemoteLogger(; port=50010)
+with_logger(logger) do
+    @debug "debug"
+    @info "info"
+end
+close(logger)
+
+In this case, only the info message should be transported over the network.
+```
 """
 function ConsoleRemoteLogger(;
     host::IPAddr = IPv4(0),

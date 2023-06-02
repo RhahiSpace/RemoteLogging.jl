@@ -4,11 +4,28 @@ struct ConsoleRemoteLogger{T<:AbstractLogger} <: AbstractLogger
 end
 
 """
-    ConsoleRemoteLogger(; kwargs...)
+    ConsoleRemoteLogger(; [kwargs...])
 
-Send log messages to a remote listener over the network.
+Create a logger that sends log messages over TCP as text.
 
-See RemoteLogger for documentation of keyword arguments.
+For full help of keyword arguments, see [`RemoteLogger`](@ref)
+
+To change formatting of the logger, pass a function that accepts IO and returns
+a FormatLogger using that IO. This formatter will be used as tthe final sink
+in ConsoleRemoteLogger. Otherwise, Logging.ConsoleLogger is used.
+
+# Example
+```julia
+# assuming that a listener has already been set up
+logger = ConsoleRemoteLogger(; port=50010)
+with_logger(logger) do
+    @debug "debug"
+    @info "info"
+end
+close(logger)
+
+In this case, only the info message should be transported over the network.
+```
 """
 function ConsoleRemoteLogger(;
     host::IPAddr = IPv4(0),
@@ -35,6 +52,7 @@ function ConsoleRemoteLogger(;
     return ConsoleRemoteLogger(tcp, logger)
 end
 
+"An exmaple for implementing formatter for ConsoleRemoteLogger."
 function console_example_formatter(ioc::IOContext)
     FormatLogger(ioc) do io, args
         println(io, args.message)
@@ -48,19 +66,30 @@ function connect_to_listener(host, port, displaywidth)
     return tcp, ioc
 end
 
-"""
-    ProgressRemoteLogger(; host, port)
-
-Progress bars produced with this logger will appear in the remote listener.
-
-- `host`: IP address of the listener. Should be running in advance.
-- `port`: Port of the listener.
-"""
 struct ProgressRemoteLogger{T<:AbstractLogger} <: AbstractLogger
     tcp::TCPSocket
     logger::T
 end
 
+"""
+    ProgressRemoteLogger(; [host,] [port])
+
+Create a logger that sends ProgressLogging.Progress information over TCP.
+
+# Example
+```julia
+# assuming that a listener has already been set up
+logger = ProgressRemoteLogger(; port=50011)
+with_logger(logger) do
+    @progress for i=1:10
+        sleep(0.1)
+    end
+end
+close(logger)
+```
+
+The progress message should appear on the remote listener.
+"""
 function ProgressRemoteLogger(;
     host::IPAddr=IPv4(0),
     port::Integer=50004,
@@ -97,22 +126,25 @@ struct RemoteLogger{T<:AbstractLogger} <: AbstractLogger
 end
 
 """
-    RemoteLogger(; kwargs...)
+    RemoteLogger(; [kwargs...])
 
-Combination of ConsoleRemoteLogger and ProgressRemoteLogger. Log messages
+A combined ConsoleRemoteLogger and ProgressRemoteLogger. Log messages
 and progress bars produced with this logger will appear in the remote listener.
 
 # Arguments
 
-- `host`: IP address of the listener. Should be running in advance.
+- `host`: IP address of the listener. The listener should be running in advance.
 - `port`: Port of the listener. `port` and `port+1` will be used.
-- `console_displaywidth`: intended width of the log viewer.
-- `console_loglevel`: minimum log level to be displayed on remote console
+- `console_displaywidth`: intended width of the log viewer. It can be used by
+  the printer. RemoteLogging's default listener does not use this value.
+- `console_loglevel`: minimum log level to be sent to the remote console
 - `console_formatter`: extra formatter for console. It should be a function that
   accepts a logger and combine it with a another compositional logger.
-- `console_exclude_group`: log groups to ignore in console. Ignores
-  :ProgressLogging by default.
-- `console_exclude_module`: source modules to ignore in console.
+- `console_exclude_group`: log groups to ignore. Log messages with this group
+  will not be sent to ConsoleRemoteLogger. Ignores :ProgressLogging by default.
+- `console_exclude_module`: source modules to ignore in console. Log messages
+  that used to be hidden because it originates from another library will not
+  be filtered here. Specify them here so that they will not be sent.
 """
 function RemoteLogger(;
     host::IPAddr = IPv4(0),
@@ -157,10 +189,8 @@ Find the root module of the given module.
 Useful for filtering out modules in log messages.
 """
 function root_module(m::Module)
-    gp = m
-    while (gp ≠ m)
+    while m != parentmodule(m)
         m = parentmodule(m)
-        gp = m
     end
-    nameof(gp)
+    nameof(m)
 end

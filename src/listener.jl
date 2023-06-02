@@ -1,21 +1,42 @@
-"A shortcut function to start progress and message display"
+"""
+    activate_listener(host, port; [autoclose])
+
+Start both progress and message listener using given host and port, port+1.
+If block is true, block the console, and clear the screen whenever a new line
+(enter) is pressed. To close the listener and disconnect the server, use Ctrl+C.
+"""
 function activate_listener(host::IPAddr=IPv4(0), port::Integer=50003;
-    autoclose=false
+    block=true
 )
     tcp1 = RemoteLogging.listen_message(host, port)
     tcp2 = RemoteLogging.listen_progress(host, port+1)
-    if autoclose
+    if block
         try
-            readline(stdin)
+            while true
+                readline(stdin)
+                print("\033c")
+            end
+        catch e
+            if isa(e, InterruptException)
+                println()
+                @info "Closing listener (Keyboard interrupt)"
+            else
+                error(e)
+            end
         finally
             close(tcp1)
             close(tcp2)
+            return nothing
         end
     end
     return tcp1, tcp2
 end
 
-"Listen to progress messages and show it"
+"""
+    listen_progress(host, port)
+
+Listen to progress messages and show it.
+"""
 function listen_progress(host, port)
     server = listen(host, port)
     client_id = 0
@@ -37,7 +58,7 @@ function listen_progress(host, port)
                                 push!(active_progress, msg.id)
                             end
                             @info ProgressLogging.ProgressString(msg)
-                            if msg.done || isnothing(msg.fraction)
+                            if msg.done
                                 idx = findfirst(x->x==msg.id, active_progress)
                                 deleteat!(active_progress, idx)
                             end
@@ -62,7 +83,12 @@ function listen_progress(host, port)
     server
 end
 
-"Listen to any incoming message and print it"
+"""
+    listen_message(host, port, [io])
+
+Listen to incoming messages and print them.
+The formatting of the messages should be set in the RemoteLogger.
+"""
 function listen_message(host, port, io=stderr)
     server = listen(host, port)
     client_id = 0

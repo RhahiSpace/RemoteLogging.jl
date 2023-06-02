@@ -1,15 +1,26 @@
 "A shortcut function to start progress and message display"
 function activate_listener(host::IPAddr=IPv4(0), port::Integer=50003;
-    autoclose=true
+    block=true
 )
     tcp1 = RemoteLogging.listen_message(host, port)
     tcp2 = RemoteLogging.listen_progress(host, port+1)
-    if autoclose
+    if block
         try
-            readline(stdin)
+            while true
+                readline(stdin)
+                print("\033c")
+            end
+        catch e
+            if isa(e, InterruptException)
+                println()
+                @info "Closing listener (Keyboard interrupt)"
+            else
+                error(e)
+            end
         finally
             close(tcp1)
             close(tcp2)
+            return nothing
         end
     end
     return tcp1, tcp2

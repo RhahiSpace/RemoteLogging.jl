@@ -192,5 +192,5 @@ function root_module(m::Module)
     while m != parentmodule(m)
         m = parentmodule(m)
     end
-    nameof(gp)
+    nameof(m)
 end

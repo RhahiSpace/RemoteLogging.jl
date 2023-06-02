@@ -177,10 +177,8 @@ Find the root module of the given module.
 Useful for filtering out modules in log messages.
 """
 function root_module(m::Module)
-    gp = m
-    while (gp ≠ m)
+    while m != parentmodule(m)
         m = parentmodule(m)
-        gp = m
     end
     nameof(gp)
 end
